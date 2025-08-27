@@ -1,20 +1,40 @@
 from flask import Flask, request, jsonify
 import joblib
 import os
+
 app = Flask(__name__)
 
 # Load the model
-model = joblib.load("final_model_90.joblib")
+try:
+    model = joblib.load("final_model_90.joblib")
+except Exception as e:
+    print(f"Error loading model: {e}")
+    model = None
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return {"message": "Welcome to API!"}
+    return {"message": "Welcome to NASA Space App Challenge API!", "status": "healthy"}
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    model_status = "healthy" if model is not None else "unhealthy"
+    return {
+        "status": "healthy",
+        "model_status": model_status,
+        "timestamp": "2025-01-27T00:00:00Z",
+    }
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    if model is None:
+        return jsonify({"error": "Model not available"}), 503
+
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
     features = data.get("features")
     if features is None:
