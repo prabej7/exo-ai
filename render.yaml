@@ -14,3 +14,5 @@ services:
         value: "1"
       - key: PIP_USE_PEP517
         value: "0"
+      - key: PIP_DISABLE_PIP_VERSION_CHECK
+        value: "1"
